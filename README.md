@@ -9,5 +9,13 @@ Local and personal weather reporting.
 
 Have the above thoughts? This program will help Indians.
 
-### How to for OSX
-Todo...
+### How to ... for OSX
+
+###### Load
+~/india-weather/osx/launchctl-load
+
+###### Unload
+~/india-weather/osx/launchctl-unload
+
+### How to ... for Linux
+Please fork and contribute :)
