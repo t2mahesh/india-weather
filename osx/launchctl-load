@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd $(dirname $0)
+cd ..
+DIR="$(pwd)"
+
+plist_out="$(cat ./osx/me.local.india-weather.plist | sed s!~.india-weather!$DIR!g)"
+echo "$plist_out" > ./osx/new_plist.plist
+
+mv ./osx/new_plist.plist ~/Library/LaunchAgents/me.local.india-weather.plist
+
+launchctl load ~/Library/LaunchAgents/me.local.india-weather.plist
+launchctl list | grep me.local.india-weather
+echo "Done."

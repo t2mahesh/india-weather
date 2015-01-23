@@ -1,0 +1,8 @@
+#!/bin/bash
+
+launchctl unload ~/Library/LaunchAgents/me.local.india-weather.plist
+launchctl list | grep me.local.india-weather
+
+rm -r ~/Library/LaunchAgents/me.local.india-weather.plist
+
+echo "Done unloading."

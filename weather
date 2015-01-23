@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# bin directory location
+bash_dir="$(dirname $0)"
+echo "Script location: $bash_dir"
+cd $bash_dir
+pwd
+echo ""
+
+logfile="logs/lastmodified.txt"
+logimages="logs/images.txt"
+logimagestmp="logs/images_x.txt"
+
+head=$(curl --silent --head http://imd.gov.in/section/satmet/img/sector-ir.jpg | grep "^Last-Modified:")
+
+# Last-Modified: Fri, 16 Jan 2015 03:30:20 GMT
+# str="Fri, 16 Jan 2015 03:30:20 GMT"; str=${str% GMT} str=${str#*,}; echo "$str"
+# str="Fri, 16 Jan 2015 03:30:20 GMT"; str=${str% *} str=${str#*, }; echo "$str" 
+
+modi="$head"
+modi=${head% *}
+modi=${modi#*, }
+modi=$(echo $modi | sed "s/ /-/g")
+modi=$(echo $modi | sed "s/:/-/g")
+
+filename="images/$modi.jpg"
+echo "File name: $filename"
+
+if [ -f $logfile ]; then
+	while read -r line
+	do
+		echo "$line"
+		echo "$head"
+		echo ""
+		if [ "$line" == "$head" ]; then
+			echo "Not downloading."
+		else
+			echo "Downloading."
+			echo "$head" > $logfile
+			curl -L -o $filename http://imd.gov.in/section/satmet/img/sector-ir.jpg
+			ls images/*.jpg > $logimages
+		fi
+	done < $logfile
+else
+	echo "Downloading. File not exist"
+	echo "$head" > $logfile
+	curl -L -o $filename http://imd.gov.in/section/satmet/img/sector-ir.jpg
+	ls images/*.jpg > $logimages
+fi
+
+
+# Check images.txt file for max 10 lines and 
+# delete all unwanted lines and files.
+
+declare -a imgarr
+while read -r imgline
+do
+	imgarr+=("${imgline}")
+done < $logimages
+length=${#imgarr[*]}
+
+i=0
+upto=$((length-10))
+
+while :
+do
+	if [ $i -lt $upto ]; then
+		echo "Remove: ${imgarr[$i]}"
+		rm -r ${imgarr[$i]}
+	else
+		echo "${imgarr[$i]}" >> $logimagestmp 
+	fi
+	if [ $i -ge $((length-1)) ]; then
+		break
+	else
+		i=$((i+1))
+	fi
+done
+
+rm -r $logimages
+mv $logimagestmp $logimages
+
+open index.html

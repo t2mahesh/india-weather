@@ -1,0 +1,46 @@
+<html>
+	<head><title>Weather</title></head>
+	<body style="padding:0px; margin:0px">
+		<div id="weather_image" style="width:1024; height:1200">&nbsp;</div>
+
+		<script language="javascript">
+			var weather_image = document.getElementById("weather_image");
+			var weather_image_style = weather_image.style;
+
+			var images;
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function(){
+				if(xmlhttp.readyState == 4) {
+					var content = xmlhttp.responseText;
+					//weather_image.innerHTML="<pre>Images:<br>"+content+"</pre>";
+					images = content.split("\n");
+					animate();
+				}
+			};
+			xmlhttp.open("GET", "logs/images.txt", true);
+			xmlhttp.send();
+
+			var waitfor = 500;
+			var timeout;
+			var index = 0;
+			function animate() {
+				timeout = setTimeout(function(){ 
+					changeImage()
+				}, waitfor);
+			}
+
+			function changeImage() {
+				weather_image_style.backgroundImage = "url('./"+images[index]+"')";
+				//weather_image.innerHTML = index+": "+images[index];
+				if(index < images.length-2) {
+					index++;
+					waitfor = 500;
+				} else {
+					index = 0;
+					waitfor = 2000;
+				}
+				animate();
+			}
+		</script>
+	</body>
+</html>
